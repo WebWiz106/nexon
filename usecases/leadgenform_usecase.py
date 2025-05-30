@@ -37,8 +37,8 @@ def create_lead_gen_form(token, data):
         form_slug = re.sub(r"[^a-z0-9]+", "-", title).strip("-")
 
         form_unique_id = str(uuid.uuid4())
-
-        form_live_url = f"https://forms.eazotel.com/{tenant_data["domain"]}/{hId}/{form_slug}/{form_unique_id}"
+        domain = tenant_data["domain"]
+        form_live_url = f"https://forms.eazotel.com/{domain}/{hId}/{form_slug}/{form_unique_id}"
         new_form = {
             "ndid": ndid,
             "hId": hId,
