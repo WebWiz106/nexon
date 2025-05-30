@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Failure</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f9f9f9;
+      }
+      .alert {
+        width: 400px;
+        padding: 20px;
+        border: 2px solid #dc3545;
+        border-radius: 10px;
+        background-color: #f8d7da;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .alert-icon {
+        font-size: 64px;
+        color: #dc3545;
+        margin-bottom: 20px;
+      }
+      .alert-message {
+        font-size: 24px;
+        color: #dc3545;
+        margin-bottom: 20px;
+      }
+      .alert-description {
+        font-size: 18px;
+        color: #555;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="alert">
+      <div class="alert-icon">&#9888;</div>
+      <div class="alert-message">Payment Failed</div>
+      <div class="alert-description">
+        We're sorry, but there was an issue processing your payment.
+      </div>
+    </div>
+  </body>
+</html>

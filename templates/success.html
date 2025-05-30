@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transaction Success</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      h1,
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+      .button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-top: 20px;
+        text-align: center;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .details,
+      .customer-info,
+      .hotel-info,
+      .price-info {
+        padding: 25px;
+        margin-top: 20px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+      }
+      .outer {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        align-items: center; /* Align items vertically */
+      }
+      .outer div:first-child {
+        flex-basis: 30%;
+        text-align: center; /* Align text to the right */
+        padding-left: 100px;
+      }
+      .outer div:last-child {
+        flex-basis: 60%;
+        padding-left: 50px; /* Increased padding from the left */
+      }
+      .logo {
+        display: block;
+        margin: 0 auto 20px; /* Center the logo */
+        width: 100px;
+        height: 100px;
+      }
+      .img-cont {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="img-cont">
+        <img class="logo" src="{{logo}}" />
+      </div>
+
+      <h1>Transaction Successful!</h1>
+      <div class="details">
+        <div>
+          <div class="outer">
+            <div>Transaction ID:</div>
+            <div id="transactionId">{{data.payment.payId }}</div>
+          </div>
+          <div class="outer">
+            <div>Booking ID:</div>
+            <div id="bookingId">{{data.bookingId}}</div>
+          </div>
+          <div class="outer">
+            <div>Order ID:</div>
+            <div id="orderId">{{data.payment.RefNo }}</div>
+          </div>
+          <div class="outer">
+            <div>Checkin Date:</div>
+            <div id="orderId">{{data.checkIn}}</div>
+          </div>
+          <div class="outer">
+            <div>Checkout Date:</div>
+            <div id="orderId">{{data.checkOut}}</div>
+          </div>
+          <div class="outer">
+            <div>Payment Mode:</div>
+            <div id="orderId">{{data.payment.Mode}}</div>
+          </div>
+          <div class="outer">
+            <div>Adults:</div>
+            <div id="orderId">{{data.Adults}}</div>
+          </div>
+          <div class="outer">
+            <div>Kids:</div>
+            <div id="orderId">{{data.Kids}}</div>
+          </div>
+          <div class="outer">
+            <div>Room Number:</div>
+            <div id="orderId">
+              {% for roomNumber in data.roomNumbers %} {{ roomNumber }} {% if
+              not loop.last %}
+              <!-- Add space if not the last roomNumber -->
+              &nbsp;&nbsp;
+              <!-- You can adjust the number of space characters or use any other separator -->
+              {% endif %} {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="customer-info">
+        <h2>Customer Information:</h2>
+        <div>
+          <div class="outer">
+            <div>Name:</div>
+            <div id="customerName">{{data.guestInfo.guestName}}</div>
+          </div>
+          <div class="outer">
+            <div>Phone:</div>
+            <div id="customerPhone">{{data.guestInfo.Phone}}</div>
+          </div>
+          <div class="outer">
+            <div>Email:</div>
+            <div id="customerEmail">{{data.guestInfo.EmailId}}</div>
+          </div>
+          <div class="outer">
+            <div>City:</div>
+            <div id="customerEmail">{{data.guestInfo.City}}</div>
+          </div>
+          <div class="outer">
+            <div>Country:</div>
+            <div id="customerEmail">{{data.guestInfo.Country.label}}</div>
+          </div>
+          <div class="outer">
+            <div>Address:</div>
+            <div id="customerEmail">{{data.guestInfo.address}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="hotel-info">
+        <h2>Hotel Information:</h2>
+        <div>
+          <div class="outer">
+            <div>Hotel Name:</div>
+            <div id="hotelName">{{hotelname}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="price-info">
+        <h2>Price Information:</h2>
+        <div>
+          <div class="outer">
+            <div>Booking Amount:</div>
+            <div id="hotelName">{{data.price.Principal}}</div>
+          </div>
+          <div class="outer">
+            <div>Tax:</div>
+            <div id="hotelName">{{data.price.Tax}}</div>
+          </div>
+          <div class="outer">
+            <div>Total:</div>
+            <div id="hotelName">{{data.price.Total}}</div>
+          </div>
+          <div class="outer">
+            <div>Amout Paid:</div>
+            <div id="hotelName">{{data.price.amountPay}}</div>
+          </div>
+        </div>
+      </div>
+      <button class="button" onclick="createPDF()">Download as PDF</button>
+    </div>
+
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://html2canvas.hertzen.com/dist/html2canvas.js"
+    ></script>
+    <script>
+      function createPDF() {
+        print();
+      }
+    </script>
+  </body>
+</html>
