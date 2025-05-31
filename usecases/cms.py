@@ -1153,7 +1153,10 @@ def getWebsiteData(domain):
     try:
         logging.info(f"{domain}")
         data = db.WebsiteData.find_one({"Domain": domain})
-        return data.get("ndid"), data.get("Details")
+        profile_data = db.Zucks_profile.find_one({"domain": domain})
+        hotels_data = profile_data.get('hotels')
+        hid = list(hotels_data.keys())[0]
+        return data.get("ndid"), data.get("Details"), hid
     except:
         return None
 

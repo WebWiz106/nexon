@@ -469,8 +469,8 @@ def editHouseRules():
 @cms_controller.route("/get/website/<domain>", methods=["GET"])
 def getWebsiteData(domain):
     try:
-        ndid, websitedata = cms.getWebsiteData(domain)
-        return jsonify({"Status": True, "WebsiteData": websitedata, "ndid": ndid})
+        ndid, websitedata, hid = cms.getWebsiteData(domain)
+        return jsonify({"Status": True, "WebsiteData": websitedata, "ndid": ndid, "hid":hid})
     except:
         return jsonify({"Status": False})
 
