@@ -80,11 +80,15 @@ def createWebsiteEazotel():
     try:
         maintenance_details = request.get_json(force=True)
 
-        # =======Domain Generate==========
+        # =======Domain Generate Flow==========
         domain = eazotel_usecase.randomDomainName(maintenance_details.get("hotelName"))
+
+        #plan will decide what to build
         plandetail = db.Zucks_plans.find_one(
             {"planName": maintenance_details.get("planName")}
         )
+
+
         locationid = eazotel_usecase.createHotelId()
         ndid = utils.get_ndid(maintenance_details.get("Token"))
 

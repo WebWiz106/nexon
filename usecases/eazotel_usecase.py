@@ -2312,10 +2312,8 @@ def data_to_create_for_website(
         "Maintainance": False,
         "ndid": ndid,
         # "hId": locationid,
-        "hotels": [
-            {
-                "hId": locationid,
-                "Details": {
+        "hotels": {
+            locationid:{
                     "Navbar": {
                         "Home": True,
                         "About": True,
@@ -3797,11 +3795,11 @@ def data_to_create_for_website(
                     },
                 },
             }
-        ],
     }
 
-    for hotel in obj["hotels"]:
-        # Initialize Lists/Dicts if they don't exist
+    for location_id, hotel in obj["hotels"].items():
+        # Initialize nested dict if it doesn't exist
+        hotel.setdefault("Details", {})
         hotel["Details"].setdefault("Links", {})
         hotel["Details"].setdefault("Images", [])
 

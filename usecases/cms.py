@@ -34,13 +34,13 @@ def EditNavbarQuery(edit_details):
         domain = domainofToken(token)
         key = edit_details.get("key")
         value = edit_details.get("value") == "true"
-
+        hid = edit_details.get("hid")
         data = db.WebsiteData.find_one({"Domain": domain})
 
-        toupdate = data["Details"].get("Navbar")
+        toupdate = data["hotels"].get(hid, {}).get("Navbar", {})
         toupdate[key] = value
 
-        updateValues = {"$set": {"Details.Navbar": toupdate}}
+        updateValues = {"$set": {f"hotels.{hid}.Navbar": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
 
@@ -61,13 +61,13 @@ def EditFacilitiesQuery(edit_details):
         domain = domainofToken(token)
         key = edit_details.get("key")
         value = edit_details.get("value") == "true"
-
+        hid = edit_details.get("hid")
         data = db.WebsiteData.find_one({"Domain": domain})
 
-        toupdate = data["Details"].get("Facilities")
+        toupdate = data["hotels"].get(hid, {}).get("Facilities")
         toupdate[key] = value
 
-        updateValues = {"$set": {"Details.Facilities": toupdate}}
+        updateValues = {"$set": {f"hotels.{hid}.Facilities": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
 
@@ -1156,7 +1156,7 @@ def getWebsiteData(domain):
         profile_data = db.Zucks_profile.find_one({"domain": domain})
         hotels_data = profile_data.get('hotels')
         hid = list(hotels_data.keys())[0]
-        return data.get("ndid"), data.get("Details"), hid
+        return data.get("ndid"), data.get("hotels"), hid
     except:
         return None
 
@@ -1165,7 +1165,7 @@ def getWebsiteDataonNdid(ndid):
     try:
         logging.info(f"{ndid}")
         data = db.WebsiteData.find_one({"ndid": ndid})
-        return data.get("ndid"), data.get("Details")
+        return data.get("ndid"), data.get("hotels")
     except:
         return None
 
@@ -1298,18 +1298,20 @@ def getuserTemplateInfo(token):
 def postReviewData(data):
     try:
         ndid = utils.get_ndid(data.get("Token"))
+        hid = data.get("hid")
+
+        update_fields = {
+            f"hotels.{hid}.Reviews.Clarity": data.get("Clarity"),
+            f"hotels.{hid}.Reviews.Analytics": data.get("Analytics"),
+            f"hotels.{hid}.Reviews.TagManager": data.get("TagManager"),
+            f"hotels.{hid}.Reviews.Console": data.get("Console"),
+            f"hotels.{hid}.Reviews.Pixel": data.get("Pixel"),
+            f"hotels.{hid}.Reviews.Pagespeed": data.get("Pagespeed"),
+        }
+
         db.WebsiteData.find_one_and_update(
             {"ndid": ndid},
-            {
-                "$set": {
-                    "Details.Reviews.Clarity": data.get("Clarity"),
-                    "Details.Reviews.Analytics": data.get("Analytics"),
-                    "Details.Reviews.TagManager": data.get("TagManager"),
-                    "Details.Reviews.Console": data.get("Console"),
-                    "Details.Reviews.Pixel": data.get("Pixel"),
-                    "Details.Reviews.Pagespeed": data.get("Pagespeed"),
-                }
-            },
+            {"$set": update_fields}
         )
 
         return True
@@ -1394,8 +1396,9 @@ def getHotelLinks(token):
 
 def updateOffers(data):
     ndid = utils.get_ndid(data.get("token"))
+    hid = data.get("hid")
     offer_detail = data.get("offer")
     db.WebsiteData.find_one_and_update(
-        {"ndid": ndid}, {"$set": {"Details.Offers": offer_detail}}
+        {"ndid": ndid}, {"$set": {f"hotels.{hid}.Offers": offer_detail}}
     )
     return True
