@@ -57,7 +57,7 @@ def add_website_data_based_on_location(hid, ndid):
     hotels = data["hotels"][0]
     details = hotels["Details"]
 
-    return details
+    return hotels
 
 
 def add_locations_of_hotel(location_details):
@@ -90,8 +90,7 @@ def add_locations_of_hotel(location_details):
 
         websiteUpdatedData = add_website_data_based_on_location(hid, ndid)
         new_hotel_object = {
-            "hId": new_location,
-            "Details": websiteUpdatedData,  # or {} if no data is needed here
+            new_location:websiteUpdatedData,  # or {} if no data is needed here
         }
 
         # print("new object", new_hotel_object)
@@ -103,11 +102,14 @@ def add_locations_of_hotel(location_details):
         profile_updating = db.Zucks_profile.find_one_and_update(
             {"uId": ndid}, {"$set": {"hotels": locationdetails}}
         )
+        details = db.WebsiteData.find_one({"ndid": ndid})
+        data = details["hotels"]
+        data[new_location] = websiteUpdatedData
 
         # updating website data
         db.WebsiteData.update_one(
             {"ndid": ndid},
-            {"$push": {"hotels": new_hotel_object}},
+            {"$push": {"hotels": data}},
         )
 
         # print(profile_updating)

@@ -85,6 +85,7 @@ def AddDeleteBannerQuery(edit_details):
     try:
         logging.info(f"{edit_details}")
         token = edit_details.get("token")
+        hid = edit_details.get("hid")
         domain = domainofToken(token)
         operation = edit_details.get("operation")
         Heading = edit_details.get("Heading")
@@ -94,7 +95,7 @@ def AddDeleteBannerQuery(edit_details):
         index = edit_details.get("index", "0")
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"].get("Banner")
+        toupdate = data["hotels"].get(hid, {}).get("Banner")
 
         listToAdd = {
             "Heading": Heading,
@@ -104,13 +105,13 @@ def AddDeleteBannerQuery(edit_details):
         }
         if operation == "append":
             toupdate += [listToAdd]
-            updateValues = {"$set": {"Details.Banner": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Banner": toupdate}}
             updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
             return True, "Banner Added Successfully"
 
         else:
             toupdate.pop(int(index))
-            updateValues = {"$set": {"Details.Banner": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Banner": toupdate}}
             updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
             return True, "Banner Deleted Successfully"
     except:
@@ -129,6 +130,7 @@ def EditBannerQuery(edit_details):
         text = edit_details.get("edittext")
         subheading = edit_details.get("editsubhead")
         video = edit_details.get("editvideo")
+        hid = edit_details.get("hid")
 
         uploaddata = {
             "Heading": text,
@@ -136,7 +138,7 @@ def EditBannerQuery(edit_details):
             "url": image,
             "video": video,
         }
-        updateValues = {"$set": {"Details.Banner." + index: uploaddata}}
+        updateValues = {"$set": {f"hotels.{hid}.Banner." + index: uploaddata}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
 
@@ -157,17 +159,18 @@ def AddDeleteImagesQuery(edit_details):  # append , delete
         operation = edit_details.get("operation")
         imageurl = edit_details.get("imageurl")
         index = edit_details.get("index", "0")
+        hid = edit_details.get("hid")
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"]["Images"]
+        toupdate = data["hotels"].get(hid, {}).get("Images", {})
         listToAdd = {"Image": imageurl}
         if operation == "append":
             toupdate += [listToAdd]
-            updateValues = {"$set": {"Details.Images": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Images": toupdate}}
 
         else:
             toupdate.pop(int(index))
-            updateValues = {"$set": {"Details.Images": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Images": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
 
@@ -185,8 +188,9 @@ def EditImagesQuery(edit_details):
         domain = domainofToken(token)
         index = str(edit_details.get("index"))
         image = edit_details.get("image")
+        hid = edit_details.get("hid")
 
-        updateValues = {"$set": {"Details.Images." + index: {"Image": image}}}
+        updateValues = {"$set": {f"hotels.{hid}.Images." + index: {"Image": image}}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
 
@@ -207,10 +211,11 @@ def EditHotelAd(edit_details):
         heading = edit_details.get("heading")
         image = edit_details.get("image")
         video = edit_details.get("video")
+        hid = edit_details.get("hid")
 
         updateValues = {
             "$set": {
-                "Details.HotelAdvr": {
+                f"hotels.{hid}.HotelAdvr": {
                     "heading": heading,
                     "Image": image,
                     "video": video,
@@ -237,12 +242,13 @@ def EditLinksStatusQuery(edit_details):
         key = edit_details.get("key")
         value = edit_details.get("value")
         ndid = utils.get_ndid(token)
+        hid = edit_details.get("hid")
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"]["Links"]
+        toupdate = data["hotels"].get(hid, {}).get("Links", {})
         toupdate[key] = value
 
-        updateValues = {"$set": {"Details.Links": toupdate}}
+        updateValues = {"$set": {f"hotels.{hid}.Links": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         # updateDb1 = db.BookingEngineData.update_one({"ndid":ndid},updateValues)
@@ -267,11 +273,12 @@ def EditLinksValueQuery(edit_details):
         Youtube = edit_details.get("Youtube")
         Linkedin = edit_details.get("Linkedin")
         Tripadvisors = edit_details.get("Tripadvisors")
+        hid = edit_details.get("hid")
 
         ndid = utils.get_ndid(token)
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"]["Links"]
+        toupdate = data["hotels"].get(hid, {}).get("Links", {})
         toupdate["Facebook"] = Facebook
         toupdate["Instagram"] = Instagram
         toupdate["Twitter"] = Twitter
@@ -279,7 +286,7 @@ def EditLinksValueQuery(edit_details):
         toupdate["Linkedin"] = Linkedin
         toupdate["Tripadvisors"] = Tripadvisors
 
-        updateValues = {"$set": {"Details.Links": toupdate}}
+        updateValues = {"$set": {f"hotels.{hid}.Links": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         updateDb1 = db.BookingEngineData.update_many({"ndid": ndid}, updateValues)
@@ -307,6 +314,7 @@ def EditFooterQuery(edit_details):
         WhatsApp = edit_details.get("WhatsApp")
         NewsLetterText = edit_details.get("NewsLetterText")
         ndid = utils.get_ndid(token)
+        hid = edit_details.get("hid")
 
         toupdate = {
             "Address": Address,
@@ -318,7 +326,7 @@ def EditFooterQuery(edit_details):
             "AboutText": Abouttext,
             "Logo": logo,
         }
-        updateValues = {"$set": {"Details.Footer": toupdate}}
+        updateValues = {"$set": {f"hotels.{hid}.Footer": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         updateDb1 = db.BookingEngineData.update_many({"ndid": ndid}, updateValues)
@@ -341,9 +349,10 @@ def EditAboutQuery(edit_details):
         Text = edit_details.get("Text")
         url = edit_details.get("url")
         video_url = edit_details.get("video_url")
+        hid = edit_details.get("hid")
 
         update = {"Heading": heading, "Text": Text, "url": url, "video_url": video_url}
-        updateValues = {"$set": {"Details.About": update}}
+        updateValues = {"$set": {f"hotels.{hid}.About": update}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         return True
@@ -366,10 +375,11 @@ def EditPagesTitlesQuery(edit_details):  # check pls
         Description = edit_details.get("Description")
         Image = edit_details.get("Image")
         Video = edit_details.get("Video")
+        hid = edit_details.get("hid")
         try:
             updateValues = {
                 "$set": {
-                    "Details.PagesTitles."
+                    f"hotels.{hid}.PagesTitles."
                     + key: {
                         "Title": Title,
                         "Description": Description,
@@ -398,8 +408,9 @@ def EditEngineQuery(edit_details):
         token = edit_details.get("token")
         domain = domainofToken(token)
         newlink = edit_details.get("newLink")
+        hid = edit_details.get("hid")
 
-        updateValues = {"$set": {"Details.Engine": newlink}}
+        updateValues = {"$set": {f"hotels.{hid}.Engine": newlink}}
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
 
         return True
@@ -421,16 +432,17 @@ def AddDeleteFaqQuery(edit_details):
         question = edit_details.get("question")
         answer = edit_details.get("answer")
         index = edit_details.get("index", "0")
+        hid = edit_details.get("hid")
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"]["Faq"]
+        toupdate = data["hotels"].get(hid, {}).get("Faq", {})
         listToAdd = {"Question": question, "Answer": answer}
         if operation == "append":
             toupdate += [listToAdd]
-            updateValues = {"$set": {"Details.Faq": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Faq": toupdate}}
         else:
             toupdate.pop(int(index))
-            updateValues = {"$set": {"Details.Faq": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Faq": toupdate}}
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         return True
     except:
@@ -449,9 +461,10 @@ def EditFaqQuery(edit_details):
         question = edit_details.get("question")
         answer = edit_details.get("answer")
         index = edit_details.get("index")
+        hid = edit_details.get("hid")
 
         updateValues = {
-            "$set": {"Details.Faq." + index: {"Question": question, "Answer": answer}}
+            "$set": {f"hotels.{hid}.Faq." + index: {"Question": question, "Answer": answer}}
         }
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
@@ -476,9 +489,10 @@ def AddDeleteMenuQuery(edit_details):
         price = edit_details.get("price")
         Description = edit_details.get("Description")
         index = edit_details.get("index", "0")
+        hid = edit_details.get("hid")
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"]["Menu"]
+        toupdate = data["hotels"].get(hid, {}).get("Menu", {})
         listToAdd = {
             "Image": image,
             "Name": name,
@@ -487,10 +501,10 @@ def AddDeleteMenuQuery(edit_details):
         }
         if operation == "append":
             toupdate += [listToAdd]
-            updateValues = {"$set": {"Details.Menu": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Menu": toupdate}}
         else:
             toupdate.pop(int(index))
-            updateValues = {"$set": {"Details.Menu": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Menu": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         return True
@@ -512,10 +526,11 @@ def EditMenuQuery(edit_details):
         price = edit_details.get("price")
         Description = edit_details.get("Description")
         index = edit_details.get("index")
+        hid = edit_details.get("hid")
 
         updateValues = {
             "$set": {
-                "Details.Menu."
+                f"hotels.{hid}.Menu."
                 + index: {
                     "Image": image,
                     "Name": name,
@@ -543,18 +558,19 @@ def EditGalleryQuery(edit_details):
         operation = edit_details.get("operation")
         category = edit_details.get("category")
         imageurl = edit_details.get("imageurl")
+        hid = edit_details.get("hid")
 
         if operation == "append":
 
             updateDb = db.WebsiteData.update_one(
-                {"Domain": domain, "Details.Gallery.Category": category},
-                {"$push": {"Details.Gallery.$.Images": imageurl}},
+                {"Domain": domain, f"hotels.{hid}.Gallery.Category": category},
+                {"$push": {f"hotels.{hid}.Gallery.$.Images": imageurl}},
             )
 
         else:
             updateDb = db.WebsiteData.update_one(
-                {"Domain": domain, "Details.Gallery.Category": category},
-                {"$pull": {"Details.Gallery.$.Images": imageurl}},
+                {"Domain": domain, f"hotels.{hid}.Gallery.Category": category},
+                {"$pull": {f"hotels.{hid}.Gallery.$.Images": imageurl}},
             )
         return True
     except:
@@ -572,18 +588,19 @@ def EditGalleryStatusQuery(edit_details):
         domain = domainofToken(token)
         action = edit_details.get("action")
         category = edit_details.get("category")
+        hid = edit_details.get("hid")
 
         if action == "true":
 
             updateDb = db.WebsiteData.update_one(
-                {"Domain": domain, "Details.Gallery.Category": category},
-                {"$set": {"Details.Gallery.$.Required": True}},
+                {"Domain": domain, f"hotels.{hid}.Gallery.Category": category},
+                {"$set": {f"hotels.{hid}.Gallery.$.Required": True}},
             )
 
         else:
             updateDb = db.WebsiteData.update_one(
-                {"Domain": domain, "Details.Gallery.Category": category},
-                {"$set": {"Details.Gallery.$.Required": False}},
+                {"Domain": domain, f"hotels.{hid}.Gallery.Category": category},
+                {"$set": {f"hotels.{hid}.Gallery.$.Required": False}},
             )
         return True
     except:
@@ -604,18 +621,19 @@ def AddDeleteServicesQuery(edit_details):
     Text = edit_details.get("Text")
     Image = edit_details.get("Image")
     index = edit_details.get("index", "0")
+    hid = edit_details.get("hid")
 
     data = db.WebsiteData.find_one({"Domain": domain})
-    toupdate = data["Details"]["Services"]
+    toupdate = data["hotels"].get(hid, {}).get("Services", {})
     listToAdd = {"Title": Title, "Text": Text, "Image": Image}
 
     if operation == "append":
         toupdate += [listToAdd]
-        updateValues = {"$set": {"Details.Services": toupdate}}
+        updateValues = {"$set": {f"hotels.{hid}.Services": toupdate}}
 
     else:
         toupdate.pop(int(index))
-        updateValues = {"$set": {"Details.Services": toupdate}}
+        updateValues = {"$set": {f"hotels.{hid}.Services": toupdate}}
 
     updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
     return True
@@ -636,10 +654,11 @@ def EditServicesQuery(edit_details):
         Text = edit_details.get("Text")
         Image = edit_details.get("Image")
         index = str(edit_details.get("index"))
+        hid = edit_details.get("hid")
 
         updateValues = {
             "$set": {
-                "Details.Services."
+                f"hotels.{hid}.Services."
                 + index: {"Title": Title, "Text": Text, "Image": Image}
             }
         }
@@ -664,17 +683,18 @@ def AddDeleteTeamsQuery(edit_details):
         Text = edit_details.get("Text")
         url = edit_details.get("url")
         index = edit_details.get("index", "0")
+        hid = edit_details.get("hid")
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"]["Team"]
+        toupdate = data["hotels"].get(hid, {}).get("Team", {})
         listToAdd = {"Name": Name, "Designation": Designation, "Text": Text, "url": url}
         if operation == "append":
             toupdate += [listToAdd]
-            updateValues = {"$set": {"Details.Team": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Team": toupdate}}
 
         else:
             toupdate.pop(int(index))
-            updateValues = {"$set": {"Details.Team": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Team": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         return True
@@ -696,10 +716,11 @@ def EditTeamQuery(edit_details):
         Text = edit_details.get("Text")
         url = edit_details.get("url")
         index = edit_details.get("index")
+        hid = edit_details.get("hid")
 
         updateValues = {
             "$set": {
-                "Details.Team."
+                f"hotels.{hid}.Team."
                 + index: {
                     "Name": Name,
                     "Designation": Designation,
@@ -728,17 +749,18 @@ def AddDeleteNearbyQuery(edit_details):
         Place = edit_details.get("Place")
         Description = edit_details.get("Description")
         index = edit_details.get("index", "0")
+        hid = edit_details.get("hid")
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"]["Nearby"]
+        toupdate = data["hotels"].get(hid, {}).get("Nearby", {})
         listToAdd = {"Image": Image, "Place": Place, "Description": Description}
         if operation == "append":
             toupdate += [listToAdd]
-            updateValues = {"$set": {"Details.Nearby": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Nearby": toupdate}}
 
         else:
             toupdate.pop(int(index))
-            updateValues = {"$set": {"Details.Nearby": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Nearby": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         return True
@@ -759,10 +781,11 @@ def EditNearbyQuery(edit_details):
         Place = edit_details.get("Place")
         Description = edit_details.get("Description")
         index = str(edit_details.get("index"))
+        hid = edit_details.get("hid")
 
         updateValues = {
             "$set": {
-                "Details.Nearby."
+                f"hotels.{hid}.Nearby."
                 + index: {"Image": Image, "Place": Place, "Description": Description}
             }
         }
@@ -789,9 +812,10 @@ def AddDeleteBlogsQuery(edit_details):
         Slug = edit_details.get("Slug")
         # date = edit_details.get("date")
         index = edit_details.get("index", "0")
+        hid = edit_details.get("hid")
 
         data = db.WebsiteData.find_one({"Domain": domain})
-        toupdate = data["Details"]["Blogs"]
+        toupdate = data["hotels"][hid]["Blogs"]
 
         listToAdd = {
             "Image": Image,
@@ -803,11 +827,11 @@ def AddDeleteBlogsQuery(edit_details):
 
         if operation == "append":
             toupdate += [listToAdd]
-            updateValues = {"$set": {"Details.Blogs": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Blogs": toupdate}}
 
         else:
             toupdate.pop(int(index))
-            updateValues = {"$set": {"Details.Blogs": toupdate}}
+            updateValues = {"$set": {f"hotels.{hid}.Blogs": toupdate}}
 
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         return True
@@ -831,10 +855,11 @@ def EditBlogsQuery(edit_details):
         Slug = edit_details.get("Slug")
         date = edit_details.get("date")
         index = edit_details.get("index")
+        hid = edit_details.get("hid")
 
         updateValues = {
             "$set": {
-                "Details.Blogs."
+                f"hotels.{hid}.Blogs."
                 + index: {
                     "Heading": Heading,
                     "Image": Image,
@@ -862,11 +887,12 @@ def EditSeoData(edit_details):  # page,title,description
         Title = edit_details.get("Title")
         description = edit_details.get("description")
         keyword = edit_details.get("keyword")
+        hid = edit_details.get("hid")
 
         data = {"Title": Title, "Description": description, "keyword": keyword}
         updateDb = db.WebsiteData.update_one(
-            {"Domain": domain, "Details.SeoOptimisation.PageName": Page},
-            {"$set": {"Details.SeoOptimisation.$.Data": data}},
+            {"Domain": domain, f"hotels.{hid}.SeoOptimisation.PageName": Page},
+            {"$set": {f"hotels.{hid}.SeoOptimisation.$.Data": data}},
         )
 
         return True
@@ -886,10 +912,11 @@ def EditSlugsData(edit_details):  # page,title,description
         domain = domainofToken(token)
         Page = edit_details.get("Page")
         slug = edit_details.get("slug")
+        hid = edit_details.get("hid")
 
         updateDb = db.WebsiteData.update_one(
-            {"Domain": domain, f"Details.Slugs.{Page}": {"$exists": True}},
-            {"$set": {f"Details.Slugs.{Page}.Slug": slug}},
+            {"Domain": domain, f"hotels.{hid}.Slugs.{Page}": {"$exists": True}},
+            {"$set": {f"hotels.{hid}.Slugs.{Page}.Slug": slug}},
         )
 
         return True
@@ -909,8 +936,9 @@ def EditLocationData(edit_details):
         domain = domainofToken(token)
         location = edit_details.get("location")
         ndid = utils.get_ndid(token)
+        hid = edit_details.get("hid")
 
-        updateValues = {"$set": {"Details.Location": location}}
+        updateValues = {"$set": {f"hotels.{hid}.Location": location}}
         updateDb = db.WebsiteData.update_one({"Domain": domain}, updateValues)
         # updateDb1 = db.BookingEngineData.update_one({"ndid":ndid},updateValues)
 
@@ -932,9 +960,10 @@ def EditSectionTitlesQuery(edit_details):
         key = edit_details.get("key")
         Title = edit_details.get("Title")
         Description = edit_details.get("Description")
+        hid = edit_details.get("hid")
         updateValues = {
             "$set": {
-                "Details.SectionTitles."
+                f"hotels.{hid}.SectionTitles."
                 + key: {
                     "Title": Title,
                     "Description": Description,
@@ -961,12 +990,13 @@ def EditTermsAndConditionsQuery(edit_details):
         Privacy = edit_details.get("Privacy")
         Cancellation = edit_details.get("Cancellation")
         TermsServices = edit_details.get("TermsServices")
+        hid = edit_details.get("hid")
 
         updateValues = {
             "$set": {
-                "Details.TermsConditions.0": {"Privacy": Privacy},
-                "Details.TermsConditions.1": {"Cancellation": Cancellation},
-                "Details.TermsConditions.2": {"TermsServices": TermsServices},
+                f"hotels.{hid}.TermsConditions.0": {"Privacy": Privacy},
+                f"hotels.{hid}.TermsConditions.1": {"Cancellation": Cancellation},
+                f"hotels.{hid}.TermsConditions.2": {"TermsServices": TermsServices},
             }
         }
 
@@ -988,6 +1018,7 @@ def AddDeleteEventsQuery(edit_details):
         domain = domainofToken(
             token
         )  # Assuming domainofToken is a function that extracts the domain.
+        hid = edit_details.get("hid")
         operation = edit_details.get("operation")
         Image = edit_details.get("Image")
         Text = edit_details.get("Text")
@@ -1010,14 +1041,14 @@ def AddDeleteEventsQuery(edit_details):
 
         if operation == "append":
             db.WebsiteData.update_one(
-                {"Domain": domain}, {"$push": {"Details.Events": listToAdd}}
+                {"Domain": domain}, {"$push": {f"hotels.{hid}.Events": listToAdd}}
             )
         elif operation == "pop":
             db.WebsiteData.update_one(
-                {"Domain": domain}, {"$unset": {f"Details.Events.{index}": 1}}
+                {"Domain": domain}, {"$unset": {f"hotels.{hid}.Events.{index}": 1}}
             )
             db.WebsiteData.update_one(
-                {"Domain": domain}, {"$pull": {"Details.Events": None}}
+                {"Domain": domain}, {"$pull": {f"hotels.{hid}.Events": None}}
             )
         else:
             raise ValueError("Unsupported operation")
@@ -1041,10 +1072,11 @@ def EditEventsQuery(edit_details):
         Text = edit_details.get("Text")
         Heading = edit_details.get("Heading")
         index = str(edit_details.get("index"))
+        hid = edit_details.get("hid")
 
         updateValues = {
             "$set": {
-                "Details.Events."
+                f"hotels.{hid}.Events."
                 + index: {"Image": Image, "Text": Text, "Heading": Heading}
             }
         }
@@ -1063,6 +1095,7 @@ def EditDatatoarrange(edit_details):
     try:
         logging.info(f"{edit_details}")
         token = edit_details.get("token")
+        hid = edit_details.get('hid')
         domain = domainofToken(token)
         index = edit_details.get("index")
         heading = edit_details.get("heading")
@@ -1072,7 +1105,7 @@ def EditDatatoarrange(edit_details):
         if images == "None":
             updateValues = {
                 "$set": {
-                    "Details.DataToarrange."
+                    f"hotels.{hid}.DataToarrange."
                     + index: {
                         "Heading": heading,
                         "Text": text,
@@ -1082,7 +1115,7 @@ def EditDatatoarrange(edit_details):
         else:
             updateValues = {
                 "$set": {
-                    "Details.DataToarrange."
+                    f"hotels.{hid}.DataToarrange."
                     + index: {"Heading": heading, "Text": text, "Images": images}
                 }
             }
@@ -1102,6 +1135,7 @@ def EditCheckinCheckoutRules(edit_details):
     try:
         logging.info(f"{edit_details}")
         token = edit_details.get("token")
+        hid = edit_details.get("hid")
         domain = domainofToken(token)
         checkin = edit_details.get("checkin")
         checkout = edit_details.get("checkout")
@@ -1109,15 +1143,15 @@ def EditCheckinCheckoutRules(edit_details):
 
         updateValues = {
             "$set": {
-                "Details.SectionTitles.1": {
+                f"hotels.{hid}.SectionTitles.1": {
                     "Title": "Check-in",
                     "Description": checkin,
                 },
-                "Details.SectionTitles.2": {
+                f"hotels.{hid}.SectionTitles.2": {
                     "Title": "Check-out",
                     "Description": checkout,
                 },
-                "Details.SectionTitles.3": {
+                f"hotels.{hid}.SectionTitles.3": {
                     "Title": "rules",
                     "Description": rules,
                 },
